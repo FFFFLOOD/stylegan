@@ -94,7 +94,7 @@ def _sanitize_tf_config(config_dict: dict = None) -> dict:
 def init_tf(config_dict: dict = None) -> None:
     """Initialize TensorFlow session using good default settings."""
     # Skip if already initialized.
-    if tf.get_default_session() is not None:
+    if tf.compat.v1.get_default_session() is not None:
         return
 
     # Setup config dict and random seeds.
@@ -139,7 +139,7 @@ def create_session(config_dict: dict = None, force_as_default: bool = False) -> 
             setattr(obj, fields[-1], value)
 
     # Create session.
-    session = tf.Session(config=config_proto)
+    session = tf.compat.v1.Session(config=config_proto)
     if force_as_default:
         # pylint: disable=protected-access
         session._default_session = session.as_default()
