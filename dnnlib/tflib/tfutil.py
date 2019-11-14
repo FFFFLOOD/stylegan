@@ -23,7 +23,7 @@ TfExpressionEx = Union[TfExpression, int, float, np.ndarray]
 def run(*args, **kwargs) -> Any:
     """Run the specified ops in the default session."""
     assert_tf_initialized()
-    return tf.get_default_session().run(*args, **kwargs)
+    return tf.compat.v1.get_default_session().run(*args, **kwargs)
 
 
 def is_tf_expression(x: Any) -> bool:
@@ -73,7 +73,7 @@ def absolute_name_scope(scope: str) -> tf.name_scope:
 
 def absolute_variable_scope(scope: str, **kwargs) -> tf.compat.v1.variable_scope:
     """Forcefully enter the specified variable scope, ignoring any surrounding scopes."""
-    return tf.compat.v1.variable_scope(tf.VariableScope(name=scope, **kwargs), auxiliary_name_scope=False)
+    return tf.compat.v1.variable_scope(tf.compat.v1.VariableScope(name=scope, **kwargs), auxiliary_name_scope=False)
 
 
 def _sanitize_tf_config(config_dict: dict = None) -> dict:
@@ -106,7 +106,7 @@ def init_tf(config_dict: dict = None) -> None:
     if tf_random_seed == "auto":
         tf_random_seed = np.random.randint(1 << 31)
     if tf_random_seed is not None:
-        tf.set_random_seed(tf_random_seed)
+        tf.compat.v1.set_random_seed(tf_random_seed)
 
     # Setup environment variables.
     for key, value in list(cfg.items()):
@@ -129,7 +129,7 @@ def create_session(config_dict: dict = None, force_as_default: bool = False) -> 
     """Create tf.Session based on config dict."""
     # Setup TensorFlow config proto.
     cfg = _sanitize_tf_config(config_dict)
-    config_proto = tf.ConfigProto()
+    config_proto = tf.compat.v1.ConfigProto()
     for key, value in cfg.items():
         fields = key.split(".")
         if fields[0] not in ["rnd", "env"]:
@@ -197,7 +197,7 @@ def set_vars(var_to_value_dict: dict) -> None:
         except KeyError:
             with absolute_name_scope(var.name.split(":")[0]):
                 with tf.control_dependencies(None):  # ignore surrounding control_dependencies
-                    setter = tf.assign(var, tf.placeholder(var.dtype, var.shape, "new_value"), name="setter")  # create new setter
+                    setter = tf.compat.v1.assign(var, tf.placeholder(var.dtype, var.shape, "new_value"), name="setter")  # create new setter
 
         ops.append(setter)
         feed_dict[setter.op.inputs[1]] = value
