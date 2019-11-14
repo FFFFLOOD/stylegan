@@ -121,7 +121,7 @@ def init_tf(config_dict: dict = None) -> None:
 
 def assert_tf_initialized():
     """Check that TensorFlow session has been initialized."""
-    if tf.get_default_session() is None:
+    if tf.compat.v1.get_default_session() is None:
         raise RuntimeError("No default TensorFlow session found. Please call dnnlib.tflib.init_tf().")
 
 
@@ -193,7 +193,7 @@ def set_vars(var_to_value_dict: dict) -> None:
         assert is_tf_expression(var)
 
         try:
-            setter = tf.get_default_graph().get_tensor_by_name(var.name.replace(":0", "/setter:0"))  # look for existing op
+            setter = tf.compat.v1.get_default_graph().get_tensor_by_name(var.name.replace(":0", "/setter:0"))  # look for existing op
         except KeyError:
             with absolute_name_scope(var.name.split(":")[0]):
                 with tf.control_dependencies(None):  # ignore surrounding control_dependencies
